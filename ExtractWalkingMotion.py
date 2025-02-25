@@ -5,7 +5,7 @@ import re  # Import regex for extracting numbers
 # Define source and destination directories
 SOURCE_FOLDER = "./texts"  # Change this to your actual folder
 DEST_FOLDER = "./walking_texts"  # Change this to your filtered folder
-OUTPUT_FILE = os.path.join(DEST_FOLDER, "filtered_filenames.txt")  # Output filename list
+OUTPUT_FILE = "./filtered_filenames.txt"  # Output filename list
 
 # Ensure destination folder exists
 os.makedirs(DEST_FOLDER, exist_ok=True)
@@ -30,8 +30,8 @@ def contains_walking_motion(content):
     return any(keyword in content for keyword in WALKING_KEYWORDS)
 
 
-# List to store extracted numbers
-matched_numbers = []
+# List to store extracted filenames without ".txt"
+matched_filenames = []
 
 # Process each file in the source directory
 for filename in os.listdir(SOURCE_FOLDER):
@@ -46,20 +46,19 @@ for filename in os.listdir(SOURCE_FOLDER):
                 if contains_walking_motion(content):
                     shutil.copy(filepath, os.path.join(DEST_FOLDER, filename))  # Copy file
 
-                    # Extract only the number from the filename
-                    match = re.search(r"\d+", filename)
-                    if match:
-                        matched_numbers.append(match.group())  # Store extracted number
+                    # Remove only the ".txt" extension from the filename
+                    filename_without_extension = os.path.splitext(filename)[0]
+                    matched_filenames.append(filename_without_extension)  # Store filename without extension
 
                     print(f"✔ Copied: {filename}")  # Log progress
 
         except Exception as e:
             print(f"Error processing {filename}: {e}")
 
-# Save extracted numbers to a text file (one per row)
-if matched_numbers:
+# Save extracted filenames to a text file (one per row)
+if matched_filenames:
     with open(OUTPUT_FILE, "w", encoding="utf-8") as output:
-        output.write("\n".join(matched_numbers))
-    print(f"\nExtracted numbers saved to: {OUTPUT_FILE}")
+        output.write("\n".join(matched_filenames))
+    print(f"\nExtracted filenames saved to: {OUTPUT_FILE}")
 
 print("\nFiltering process complete!")
